@@ -17,12 +17,13 @@ import (
  */
 
 type ConsulGRPC struct {
-	Host string
-	Port int
+	Host      string
+	Port      int
+	ServiceId string
 }
 
 func NewConsulGRPC(host string, port int) *ConsulGRPC {
-	return &ConsulGRPC{host, port}
+	return &ConsulGRPC{host, port, ""}
 }
 
 // Register 服务注册
@@ -42,18 +43,20 @@ func (c *ConsulGRPC) Register(address string, port int, name string, tags []stri
 		DeregisterCriticalServiceAfter: "10s",
 	}
 	// 生成注册对象
+	serviceId := fmt.Sprintf("%s", uuid.NewV4())
 	registration := new(api.AgentServiceRegistration)
 	registration.Address = address
 	registration.Port = port
 	registration.Name = name
 	registration.Tags = tags
-	registration.ID = fmt.Sprintf("%s", uuid.NewV4())
+	registration.ID = serviceId
 	registration.Check = check
 	err = client.Agent().ServiceRegister(registration)
 	if err != nil {
 		return err
 	}
 
+	c.ServiceId = serviceId
 	return nil
 }
 

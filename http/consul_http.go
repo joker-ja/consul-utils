@@ -14,12 +14,13 @@ import (
 )
 
 type ConsulHTTP struct {
-	Host string
-	Port int
+	Host      string
+	Port      int
+	ServiceId string
 }
 
 func NewConsulHTTP(host string, port int) *ConsulHTTP {
-	return &ConsulHTTP{host, port}
+	return &ConsulHTTP{host, port, ""}
 }
 
 // Register 服务注册
@@ -39,18 +40,20 @@ func (c *ConsulHTTP) Register(address string, port int, name string, tags []stri
 		DeregisterCriticalServiceAfter: "10s",
 	}
 	// 生成注册对象
+	serviceId := fmt.Sprintf("%s", uuid.NewV4())
 	registration := new(api.AgentServiceRegistration)
 	registration.Address = address
 	registration.Port = port
 	registration.Name = name
 	registration.Tags = tags
-	registration.ID = fmt.Sprintf("%s", uuid.NewV4())
+	registration.ID = serviceId
 	registration.Check = check
 	err = client.Agent().ServiceRegister(registration)
 	if err != nil {
 		return err
 	}
 
+	c.ServiceId = serviceId
 	return nil
 }
 

@@ -1,4 +1,4 @@
-module consul-utils
+module joker-ja/consul-utils
 
 go 1.17
 

@@ -1,4 +1,4 @@
-module github.com/joker-ja/consul-utils
+module joker-ja/consul-utils
 
 go 1.17
 
